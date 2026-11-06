@@ -31,7 +31,8 @@ def main(argv=None):
     ap.add_argument("--language", default="ms")
     ap.add_argument("--broll", default="broll", help="folder imej/video AI")
     ap.add_argument("--music", default="ambient",
-                    help="fail muzik/nasyid, 'ambient' (jana pad lembut) atau 'none'")
+                    help="fail muzik/nasyid, 'ambient' (pad lembut), 'nasheed' (koir humming "
+                         "sedih tanpa alat muzik) atau 'none'")
     ap.add_argument("--music-db", type=float, default=-16, help="kekuatan muzik (dB)")
     ap.add_argument("--no-sfx", action="store_true")
     ap.add_argument("--title", help="tajuk besar di atas semasa hook (pilihan)")
@@ -144,6 +145,11 @@ def main(argv=None):
         music = os.path.join(a.work, "ambient.wav")
         audio.write_wav(music, audio.ambient_pad(total + 1))
         log("muzik: pad ambient lembut (dijana)")
+    elif a.music == "nasheed":
+        from .nasheed import sad_nasheed
+        music = os.path.join(a.work, "nasheed.wav")
+        audio.write_wav(music, sad_nasheed(total + 1))
+        log("muzik: nasyid humming sedih, maqam Hijaz (dijana)")
     elif a.music != "none":
         music = a.music
 

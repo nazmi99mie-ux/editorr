@@ -6,7 +6,9 @@ Fail projek:
 - `transcript.json/.srt` — transkrip Whisper large-v3 (cap masa perkataan)
 - `fixes.json` — pembetulan perkataan (Ayak→Air, Allowan→Elaun, menyambut→menyambung, Fardun→Fardu, mengajak→mengajar)
 - `cues.json` — B-roll AI & callout grafik ikut perkataan yang disebut
-- `broll_prompts.json` + `broll/` — gambar AI (SD-Turbo) dijana dengan `python -m dakwah_editor.aigen`
+- `broll/real_*.jpg` — gambar sebenar Madrasah Zawiyah (dibekalkan)
+- `broll_prompts.json` + `broll/*.jpg` lain — gambar AI (SD-Turbo) dijana dengan `python -m dakwah_editor.aigen`
+- Muzik: `--music nasheed` — koir humming sedih maqam Hijaz tanpa alat muzik (dijana, bebas hak cipta)
 
 Render semula (video sumber tidak disimpan dalam repo):
 
@@ -17,5 +19,6 @@ python -m dakwah_editor ceramah.mp4 -o dakwah_madrasah_zawiyah.mp4 \
   --cues projects/madrasah_zawiyah/cues.json \
   --broll projects/madrasah_zawiyah/broll --keep-all \
   --font "Inter Display Black" \
-  --cta "JADI PENGINFAK TETAP|Madrasah Zawiyah  •  Tekan pautan di bawah"
+  --cta "JADI PENGINFAK TETAP|Madrasah Zawiyah  •  Tekan pautan di bawah" \
+  --music nasheed --music-db -11
 ```

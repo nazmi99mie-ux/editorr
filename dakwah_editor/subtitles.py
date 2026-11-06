@@ -70,8 +70,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     for gi, g in enumerate(groups):
         g_end = g[-1]["e"] + 0.25
         if gi + 1 < len(groups):
-            g_end = min(g_end, groups[gi + 1][0]["s"])
-        g_end = max(g_end, g[-1]["e"])
+            g_end = max(min(g_end, groups[gi + 1][0]["s"]), g[-1]["e"])
+            # kumpulan seterusnya muncul 0.05s lebih awal; elak dua baris bertindih
+            g_end = min(g_end, max(0.0, groups[gi + 1][0]["s"] - 0.05))
         for wi, w in enumerate(g):
             start = w["s"] if wi else min(w["s"], max(0.0, w["s"] - 0.05))
             end = g[wi + 1]["s"] if wi + 1 < len(g) else g_end
