@@ -1,0 +1,11 @@
+[
+ {"from": "Ayak", "to": "Air"},
+ {"from": "Allowan", "to": "Elaun"},
+ {"from": "menyambut", "to": "menyambung"},
+ {"from": "Fardun", "to": "Fardu"},
+ {"from": "mengajak", "to": "mengajar", "after": 60},
+ {"from": "infak", "to": "Infak", "after": 90},
+ {"from": "pay", "to": "Pay", "after": 90},
+ {"from": "Tak", "to": "", "after": 111},
+ {"from": "gitu", "to": "", "after": 111}
+]

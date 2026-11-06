@@ -1,0 +1,24 @@
+{
+ "style": "cinematic photorealistic, 35mm film still, volumetric warm light, shallow depth of field, moody teal and amber color grade, highly detailed, no text",
+ "negative": "text, watermark, logo, deformed, blurry, cartoon",
+ "images": {
+  "pondok": "traditional Malay wooden pondok huts by a madrasah at golden hour, students in white robes and kopiah walking, tropical trees",
+  "bantu": "one hand reaching down to help pull up another hand, sunlight flare behind, kindness and help, warm golden backlight",
+  "madrasah": "small traditional Malaysian madrasah building with green roof and arches at sunrise, coconut trees, mist",
+  "muda": "back view of young boys in white kopiah reading Quran on wooden rehal stands in a wooden surau, sunlight through windows",
+  "warga": "elderly Malay man with white beard and kopiah reading an old Quran by a window, soft warm light, wrinkled hands",
+  "ibadah": "silhouettes of men praying in rows inside a simple wooden surau at dawn, light beams",
+  "makan": "simple communal meal of rice and dishes on a large dulang tray on a mat floor, hands sharing food, warm light",
+  "elektrik": "single glowing incandescent light bulb hanging in a dark wooden room at night, dust particles",
+  "air": "water flowing from an old tap into a wudhu basin, droplets, cinematic macro",
+  "selenggara": "old wooden building being repaired, hammer and tools on planks, sunlight, dust",
+  "guru": "ustaz teacher in white robe teaching a small class of students sitting on the floor of a wooden pondok, blackboard with arabic calligraphy, back view",
+  "yaman": "ancient city of Tarim Yemen with mud brick minarets and palm trees at sunset, dusty golden sky",
+  "kitab": "stack of old Islamic kitab books and an open Quran on a wooden rehal, prayer beads, candle light",
+  "majlis": "back view of a crowd seated on carpet in a mosque listening to a religious lecture, chandeliers, warm light",
+  "ikhlas": "two hands raised in dua against a glowing sunset sky, silhouette, light rays",
+  "rezeki": "golden rice paddy field in Malaysia at sunrise, mist, mountains, farmer silhouette",
+  "pahala": "glowing light particles rising into a starry night sky above a small village mosque, magical",
+  "masjid": "beautiful mosque at golden hour with minarets, birds flying, epic wide shot, serene"
+ }
+}

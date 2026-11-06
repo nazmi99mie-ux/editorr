@@ -28,6 +28,12 @@ KEYWORD_WEIGHTS = {
     "dunia": 2, "ibu": 3, "ayah": 3, "mak": 2, "anak": 2, "keluarga": 2,
     "rezeki": 3, "harta": 2, "masa": 2, "umur": 3, "muda": 2, "tua": 2,
     "nikmat": 3, "hidup": 2, "nyawa": 3,
+    # Ilmu, institusi & infak
+    "ilmu": 3, "agama": 3, "madrasah": 3, "zawiyah": 3, "pondok": 3, "guru": 3,
+    "pelajar": 2, "ustaz": 2, "mengajar": 3, "belajar": 2, "dakwah": 3,
+    "infak": 4, "penginfak": 4, "istiqamah": 4, "sumbangan": 3, "bantu": 3,
+    "membantu": 3, "rm150": 4, "warga": 2, "emas": 2, "yaman": 3, "pautan": 3,
+    "beribadah": 3, "ibadah": 3, "amalkan": 3, "berkembang": 2, "bulanan": 3,
 }
 
 # Frasa yang kuat untuk hook (soalan/kejutan).

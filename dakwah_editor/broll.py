@@ -96,3 +96,58 @@ def write_prompts(data_plan: dict, timeline: dict, path: str) -> None:
         out.append(f"- Prompt: `{visual}, {PROMPT_STYLE}`\n")
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(out) + "\n")
+
+
+def find_cue(timeline: dict, cue: str, nth: int = 1):
+    """Cari kemunculan ke-n perkataan `cue` (atau frasa 'a b') pada garis masa
+    output. Pulangkan perkataan pertama frasa itu, atau None."""
+    toks = [norm(x) for x in cue.split()]
+    ws = timeline["words"]
+    seen = 0
+    for i in range(len(ws) - len(toks) + 1):
+        if all(norm(ws[i + j]["w"]) == toks[j] for j in range(len(toks))):
+            seen += 1
+            if seen == nth:
+                return ws[i]
+    return None
+
+
+def place_cued(timeline: dict, cues: list, broll_dir: str) -> list:
+    """B-roll ditetapkan secara manual: [{"file", "cue", "nth", "dur", "offset"}].
+    Klip dipotong supaya tidak bertindih dengan klip seterusnya."""
+    placed = []
+    total = timeline["duration"]
+    for c in cues:
+        path = os.path.join(broll_dir, c["file"])
+        if not os.path.exists(path):
+            print(f"[broll] tiada fail: {path}")
+            continue
+        w = find_cue(timeline, c["cue"], c.get("nth", 1))
+        if not w:
+            print(f"[broll] cue tidak dijumpai: {c['cue']} #{c.get('nth', 1)}")
+            continue
+        start = max(0.0, w["s"] + c.get("offset", -0.12))
+        dur = c.get("dur", 3.0)
+        if c.get("to_end"):
+            dur = total - start
+        placed.append({"path": path, "start": round(start, 3), "dur": round(dur, 3),
+                       "video": os.path.splitext(path)[1].lower() in VID_EXT})
+    placed.sort(key=lambda b: b["start"])
+    for a, b in zip(placed, placed[1:]):
+        a["dur"] = round(min(a["dur"], b["start"] - a["start"]), 3)
+    placed = [b for b in placed if b["dur"] >= 0.6]
+    for b in placed:
+        b["dur"] = round(min(b["dur"], total - b["start"]), 3)
+    return placed
+
+
+def resolve_callouts(timeline: dict, callouts: list) -> list:
+    out = []
+    for c in callouts:
+        w = find_cue(timeline, c["cue"], c.get("nth", 1))
+        if not w:
+            print(f"[callout] cue tidak dijumpai: {c['cue']}")
+            continue
+        out.append({"start": round(w["s"] + c.get("offset", 0.0), 3),
+                    "dur": c.get("dur", 2.2), "text": c["text"], "sub": c.get("sub", "")})
+    return out

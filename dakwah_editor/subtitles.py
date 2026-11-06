@@ -41,7 +41,8 @@ def group_words(words: list, max_words=3, max_chars=20, gap=0.45) -> list:
 
 def build_ass(timeline: dict, path: str, font="DejaVu Sans", uppercase=True,
               title=None, cta=("SEMOGA BERMANFAAT", "Kongsikan kepada yang tersayang"),
-              flashes=(), outro_start=None, total=None, sub_y=1340) -> None:
+              flashes=(), outro_start=None, total=None, sub_y=1340,
+              callouts=(), callout_y=1010) -> None:
     lines = []
     header = f"""[Script Info]
 ScriptType: v4.00+
@@ -57,6 +58,8 @@ Style: Sub,{font},84,{WHITE},{WHITE},{BLACK},&H96000000,-1,0,0,0,100,100,1,0,1,7
 Style: Title,{font},66,{WHITE},{WHITE},{BLACK},&H80000000,-1,0,0,0,100,100,3,0,1,5,3,8,70,70,260,1
 Style: Cta,{font},78,{GOLD},{WHITE},{BLACK},&H80000000,-1,0,0,0,100,100,2,0,1,6,3,5,70,70,0,1
 Style: Cta2,{font},50,{WHITE},{WHITE},{BLACK},&H80000000,0,0,0,0,100,100,1,0,1,4,2,5,70,70,0,1
+Style: Call,{font},150,{GOLD},{WHITE},&H00152A55,&H90000000,-1,0,0,0,100,100,4,0,1,8,6,5,40,40,0,1
+Style: Call2,{font},58,{WHITE},{WHITE},{BLACK},&H90000000,-1,0,0,0,100,100,6,0,1,5,3,5,40,40,0,1
 Style: Fx,{font},10,{WHITE},{WHITE},{BLACK},{BLACK},0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
 [Events]
@@ -96,6 +99,26 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 intro = "{\\fad(60,0)\\fscx85\\fscy85\\t(0,120,\\fscx100\\fscy100)}"
             text = f"{{\\an5\\pos({W // 2},{sub_y})}}" + intro + " ".join(parts)
             lines.append(f"Dialogue: 2,{_ts(start)},{_ts(end)},Sub,,0,0,0,,{text}")
+
+    # Callout motion graphics: teks besar emas "pop" + garis cahaya + subteks
+    for c in callouts:
+        a, b = c["start"], c["start"] + c["dur"]
+        y = callout_y
+        lines.append(
+            f"Dialogue: 6,{_ts(a)},{_ts(b)},Call,,0,0,0,,"
+            f"{{\\an5\\pos({W // 2},{y})\\fad(80,250)\\blur6\\fscx170\\fscy170\\fsp30"
+            f"\\t(0,220,\\blur0.6\\fscx100\\fscy100\\fsp4)"
+            f"\\t(220,{int(c['dur'] * 1000)},\\fscx106\\fscy106)}}{_esc(c['text'])}")
+        bar = "m 0 0 l 520 0 520 8 0 8"
+        lines.append(
+            f"Dialogue: 6,{_ts(a + 0.12)},{_ts(b)},Fx,,0,0,0,,"
+            f"{{\\an5\\pos({W // 2},{y + 98})\\bord0\\shad0\\1c{GOLD}\\blur2\\fad(0,250)"
+            f"\\fscx0\\t(0,320,\\fscx100)\\p1}}{bar}")
+        if c.get("sub"):
+            lines.append(
+                f"Dialogue: 6,{_ts(a + 0.25)},{_ts(b)},Call2,,0,0,0,,"
+                f"{{\\an5\\move({W // 2},{y + 175},{W // 2},{y + 150},0,300)\\fad(200,250)}}"
+                f"{_esc(c['sub'])}")
 
     # Tajuk hook (pilihan)
     if title:

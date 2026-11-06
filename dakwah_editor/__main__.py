@@ -9,7 +9,7 @@ import json
 import os
 import sys
 
-from . import audio, broll, render, selector, subtitles
+from . import audio, broll, render, selector, subtitles, textfix
 from .keywords import KEYWORD_WEIGHTS
 
 
@@ -42,6 +42,15 @@ def main(argv=None):
     ap.add_argument("--crop-x", type=float, default=0.5, help="kedudukan crop mendatar 0..1")
     ap.add_argument("--crop-y", type=float, default=0.5)
     ap.add_argument("--no-upper", action="store_true", help="subtitle huruf biasa")
+    ap.add_argument("--fixes", help="JSON pembetulan perkataan transkrip")
+    ap.add_argument("--cues", help="JSON {broll: [...], callouts: [...]} — B-roll & "
+                    "teks grafik diletakkan pada perkataan tertentu")
+    ap.add_argument("--keep-all", action="store_true",
+                    help="kekalkan semua ayat mengikut susunan asal (hanya buang "
+                         "senyap/gagap); ayat pertama jadi hook")
+    ap.add_argument("--keep-silence", action="store_true",
+                    help="jangan laraskan cap masa perkataan kepada senyap sebenar")
+    ap.add_argument("--drop", type=int, nargs="*", default=[], help="id ayat untuk dibuang")
     ap.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     a = ap.parse_args(argv)
 
@@ -57,6 +66,10 @@ def main(argv=None):
         log(f"transkripsi dengan faster-whisper ({a.model}) ... (boleh ambil masa)")
         data = transcribe(a.input, tpath, model=a.model, language=a.language)
         write_srt(data, os.path.join(a.work, "transcript.srt"))
+    textfix.load_and_fix(data, a.fixes)
+    if not a.keep_silence:
+        n = textfix.snap_to_silences(data, textfix.detect_silences(a.input))
+        log(f"jeda senyap: {n} cap masa perkataan dilaraskan")
 
     # 2. Pelan suntingan
     ppath = os.path.join(a.work, "plan.json")
@@ -65,6 +78,9 @@ def main(argv=None):
         log(f"guna pelan {a.plan}")
     else:
         plan = selector.make_plan(data, target=a.target)
+        if a.keep_all:
+            plan["order"] = [x["id"] for x in plan["sentences"] if x["id"] not in a.drop]
+            plan["hook"] = plan["order"][0]
         with open(ppath, "w", encoding="utf-8") as f:
             json.dump(plan, f, ensure_ascii=False, indent=1)
     tl = selector.build_timeline(data, plan)
@@ -81,9 +97,15 @@ def main(argv=None):
         return 0
 
     # 3. B-roll
-    lib = broll.load_library(a.broll)
-    placed = broll.place_broll(tl, lib)
-    log(f"B-roll: {len(lib)} fail dalam pustaka, {len(placed)} diletakkan")
+    cues = json.load(open(a.cues, encoding="utf-8")) if a.cues else {}
+    if cues.get("broll"):
+        placed = broll.place_cued(tl, cues["broll"], a.broll)
+        log(f"B-roll (cue manual): {len(placed)} diletakkan")
+    else:
+        lib = broll.load_library(a.broll)
+        placed = broll.place_broll(tl, lib)
+        log(f"B-roll: {len(lib)} fail dalam pustaka, {len(placed)} diletakkan")
+    callouts = broll.resolve_callouts(tl, cues.get("callouts", []))
     with open(os.path.join(a.work, "edl.json"), "w", encoding="utf-8") as f:
         json.dump({"timeline": tl, "broll": placed}, f, ensure_ascii=False, indent=1)
 
@@ -91,12 +113,16 @@ def main(argv=None):
     outro = 3.0
     total = tl["duration"] + outro
     hook_end = tl["sections"][0]["end"]
-    flashes = [(0.0, 0.85), (hook_end, 0.35)] + [(b["start"], 0.22) for b in placed]
+    flashes = [(0.0, 0.85), (hook_end, 0.35)] + [
+        (b["start"], 0.22 if b["dur"] >= 2 else 0.1) for b in placed]
     events = [(0.0, "impact", 0.9), (hook_end - 0.35, "whoosh", 0.6),
               (tl["duration"] - 1.4, "riser", 0.35), (tl["duration"], "impact", 0.45)]
     for b in placed:
-        events.append((b["start"] - 0.3, "whoosh", 0.45))
-        events.append((b["start"] + b["dur"] - 0.35, "whoosh", 0.22))
+        events.append((b["start"] - 0.3, "whoosh", 0.45 if b["dur"] >= 2 else 0.25))
+        if b["dur"] >= 2:
+            events.append((b["start"] + b["dur"] - 0.35, "whoosh", 0.22))
+    for c in callouts:
+        events.append((c["start"], "impact", 0.35))
     last_tick = -9
     for w in tl["words"]:
         if w["kw"] and KEYWORD_WEIGHTS.get(w["kw"], 0) >= 4 and w["s"] - last_tick > 3:
@@ -106,7 +132,8 @@ def main(argv=None):
     cta = (a.cta.split("|") + [""])[:2]
     ass = os.path.abspath(os.path.join(a.work, "subs.ass"))
     subtitles.build_ass(tl, ass, font=a.font, uppercase=not a.no_upper, title=a.title,
-                        cta=cta, flashes=flashes, outro_start=tl["duration"], total=total)
+                        cta=cta, flashes=flashes, outro_start=tl["duration"], total=total,
+                        callouts=callouts)
 
     sfx_wav = None
     if not a.no_sfx:
