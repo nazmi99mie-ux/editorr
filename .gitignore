@@ -1,0 +1,5 @@
+work/
+broll/
+*.mp4
+*.mov
+__pycache__/
