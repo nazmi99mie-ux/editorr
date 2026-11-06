@@ -1,0 +1,21 @@
+# Madrasah Zawiyah — video infak sinematik (9:16, 1080p)
+
+Output: `output/dakwah_madrasah_zawiyah.mp4` (1:47, 1080×1920, 30fps, -15 LUFS)
+
+Fail projek:
+- `transcript.json/.srt` — transkrip Whisper large-v3 (cap masa perkataan)
+- `fixes.json` — pembetulan perkataan (Ayak→Air, Allowan→Elaun, menyambut→menyambung, Fardun→Fardu, mengajak→mengajar)
+- `cues.json` — B-roll AI & callout grafik ikut perkataan yang disebut
+- `broll_prompts.json` + `broll/` — gambar AI (SD-Turbo) dijana dengan `python -m dakwah_editor.aigen`
+
+Render semula (video sumber tidak disimpan dalam repo):
+
+```bash
+python -m dakwah_editor ceramah.mp4 -o dakwah_madrasah_zawiyah.mp4 \
+  --transcript projects/madrasah_zawiyah/transcript.json \
+  --fixes projects/madrasah_zawiyah/fixes.json \
+  --cues projects/madrasah_zawiyah/cues.json \
+  --broll projects/madrasah_zawiyah/broll --keep-all \
+  --font "Inter Display Black" \
+  --cta "JADI PENGINFAK TETAP|Madrasah Zawiyah  •  Tekan pautan di bawah"
+```

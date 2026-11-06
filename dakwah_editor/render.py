@@ -132,7 +132,7 @@ def render_final(base, timeline, brolls, ass_path, music_wav, sfx_wav, out,
     ass = ass_path.replace("\\", "/").replace(":", "\\:").replace("'", "\\'")
     fc.append(
         f"[{last}]tpad=stop_mode=clone:stop_duration={outro},vignette=PI/4.5,"
-        f"noise=alls=5:allf=t,ass='{ass}',"
+        f"noise=alls=3:allf=t,ass='{ass}',"
         f"fade=t=in:st=0:d=0.25,fade=t=out:st={total - 1.0:.3f}:d=1.0,format=yuv420p[vout]")
 
     k = len(brolls)
@@ -166,7 +166,8 @@ def render_final(base, timeline, brolls, ass_path, music_wav, sfx_wav, out,
         f.write(";\n".join(fc))
     run(["ffmpeg", "-y", "-v", "error", *inputs, "-filter_complex_script", script,
          "-map", "[vout]", "-map", "[aout]", "-t", f"{total:.3f}",
-         "-c:v", "libx264", "-preset", "medium", "-crf", "18", "-profile:v", "high",
+         "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-maxrate", "6M",
+         "-bufsize", "12M", "-profile:v", "high",
          "-pix_fmt", "yuv420p", "-r", str(FPS), "-c:a", "aac", "-b:a", "192k",
          "-movflags", "+faststart", out])
     return total
