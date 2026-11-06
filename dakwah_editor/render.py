@@ -99,7 +99,8 @@ def render_base(src, timeline, work, fit="cover", crop_x=0.5, crop_y=0.5, jobs=4
 
 
 def render_final(base, timeline, brolls, ass_path, music_wav, sfx_wav, out,
-                 outro=3.0, music_db=-16, premium=False):
+                 outro=3.0, music_db=-16, premium=False, logo_badge=None, logo_card=None,
+                 badge_from=3.6):
     speech = timeline["duration"]
     total = speech + outro
     inputs = ["-i", base]
@@ -139,9 +140,8 @@ def render_final(base, timeline, brolls, ass_path, music_wav, sfx_wav, out,
         + ("format=gbrp,split=2[pa][pb];[pb]scale=270:480,gblur=sigma=6,scale=1080:1920,"
            "curves=all='0/0 0.55/0.1 1/1'[pg];[pa][pg]blend=all_mode=screen:all_opacity=0.35,"
            "format=yuv420p,eq=contrast=1.05:saturation=1.06," if premium else "")
-        + "vignette=PI/4.5,"
-        f"noise=alls=3:allf=t,ass='{ass}':fontsdir='{fdir}',"
-        f"fade=t=in:st=0:d=0.25,fade=t=out:st={total - 1.0:.3f}:d=1.0,format=yuv420p[vout]")
+        + "vignette=PI/4.5,noise=alls=3:allf=t[pre]")
+    vlast = "pre"
 
     k = len(brolls)
     acur = 0
@@ -166,6 +166,25 @@ def render_final(base, timeline, brolls, ass_path, music_wav, sfx_wav, out,
         si = k + 1 + acur
         fc.append(f"[{si}:a]aresample=48000,volume=-7dB[fx]")
         mix.append("[fx]")
+    # Logo: dimasukkan selepas grade/bloom/vignette supaya warna logo kekal tepat,
+    # dan sebelum subtitle supaya teks sentiasa di atas.
+    n_in = sum(1 for x in inputs if x == "-i")
+    if logo_badge:
+        inputs += ["-loop", "1", "-framerate", str(FPS), "-t", f"{total:.3f}", "-i", logo_badge]
+        fc.append(f"[{n_in}:v]format=rgba,fade=t=in:st={badge_from}:d=0.6:alpha=1,"
+                  f"fade=t=out:st={speech - 0.4:.3f}:d=0.4:alpha=1[lgb]")
+        fc.append(f"[{vlast}][lgb]overlay=x=18:y=22:eof_action=pass[vlb]")
+        vlast, n_in = "vlb", n_in + 1
+    if logo_card:
+        fc.append(f"[{vlast}]drawbox=x=0:y=0:w=iw:h=ih:color=black@0.62:t=fill:"
+                  f"enable='gte(t,{speech:.3f})'[vdim]")
+        vlast = "vdim"
+        inputs += ["-loop", "1", "-framerate", str(FPS), "-t", f"{total:.3f}", "-i", logo_card]
+        fc.append(f"[{n_in}:v]format=rgba,fade=t=in:st={speech + 0.15:.3f}:d=0.5:alpha=1[lgc]")
+        fc.append(f"[{vlast}][lgc]overlay=x=(W-w)/2:y=150:enable='gte(t,{speech:.3f})'[vlc]")
+        vlast, n_in = "vlc", n_in + 1
+    fc.append(f"[{vlast}]ass='{ass}':fontsdir='{fdir}',"
+              f"fade=t=in:st=0:d=0.25,fade=t=out:st={total - 1.0:.3f}:d=1.0,format=yuv420p[vout]")
     fc.append(f"{''.join(mix)}amix=inputs={len(mix)}:normalize=0:duration=first,"
               f"alimiter=limit=0.95,atrim=0:{total:.3f}[aout]")
 

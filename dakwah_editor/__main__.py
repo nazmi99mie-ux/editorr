@@ -58,6 +58,8 @@ def main(argv=None):
                          "bloom, punch-zoom, bar progres")
     ap.add_argument("--reuse-base", action="store_true",
                     help="guna semula work/base.mkv (klip penceramah) jika ada — render pantas")
+    ap.add_argument("--logo", help="imej logo berlatar putih (boleh beberapa logo bersebelahan): "
+                    "lencana di sudut atas + kad logo pada penutup")
     ap.add_argument("--brand", help="tag jenama emas di atas (cth. 'Madrasah Zawiyah')")
     ap.add_argument("--keep-silence", action="store_true",
                     help="jangan laraskan cap masa perkataan kepada senyap sebenar")
@@ -141,12 +143,18 @@ def main(argv=None):
             last_tick = w["s"]
 
     cta = (a.cta.split("|") + [""])[:2]
+    logos = {}
+    if a.logo:
+        from .brandkit import build as build_brandkit
+        logos = build_brandkit(a.logo, os.path.join(a.work, "brand"))
+        log("logo: lencana sudut atas + kad penutup")
     ass = os.path.abspath(os.path.join(a.work, "subs.ass"))
     subtitles.build_ass(tl, ass, font=a.font, uppercase=not a.no_upper, title=a.title,
                         cta=cta, flashes=flashes, outro_start=tl["duration"], total=total,
                         callouts=callouts, premium=a.premium, brand=a.brand,
                         callout_font=a.callout_font, brand_font=a.brand_font,
                         sub_size=a.sub_size, max_chars=a.max_chars,
+                        logo_badge=bool(logos), logo_card=bool(logos),
                         leaks=[b["start"] for b in placed if b["dur"] >= 1.5])
 
     sfx_wav = None
@@ -176,7 +184,8 @@ def main(argv=None):
                                   crop_y=a.crop_y, jobs=a.jobs)
     log("komposit akhir (B-roll, grade, subtitle, audio) ...")
     dur = render.render_final(base, tl, placed, ass, music, sfx_wav, a.output,
-                              outro=outro, music_db=a.music_db, premium=a.premium)
+                              outro=outro, music_db=a.music_db, premium=a.premium,
+                              logo_badge=logos.get("badge"), logo_card=logos.get("card"))
     log(f"siap: {a.output} ({dur:.1f}s, 1080x1920)")
     return 0
 

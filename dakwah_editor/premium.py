@@ -29,7 +29,8 @@ def _d(layer, a, b, text, style="Fx"):
 
 
 def layers(speech_end: float, total: float, brand: str = None, leaks=(),
-           sub_y: int = 1340, seed: int = 5, font: str = "DejaVu Sans") -> list:
+           sub_y: int = 1340, seed: int = 5, font: str = "DejaVu Sans",
+           brand_tag: bool = True) -> list:
     rng = np.random.default_rng(seed)
     out = []
     base = "\\bord0\\shad0"
@@ -50,7 +51,7 @@ def layers(speech_end: float, total: float, brand: str = None, leaks=(),
                   f"\\1a&H9A&\\blur45\\fad(300,300)\\p1}}{_rect(W, band)}"))
 
     # 3. Tag jenama emas di atas
-    if brand:
+    if brand and brand_tag:
         a = 3.6
         out.append(_d(7, a, speech_end,
                       f"{{\\an5\\pos({W // 2},92)\\fn{font}\\fs42\\fsp12\\b1\\1c{GOLD}\\3c&H000000&"
@@ -103,7 +104,7 @@ def layers(speech_end: float, total: float, brand: str = None, leaks=(),
 
 
 def outro_layers(outro_start: float, total: float, brand: str = None,
-                 font: str = "DejaVu Sans") -> list:
+                 font: str = "DejaVu Sans", logo_card: bool = False) -> list:
     out = []
     base = "\\bord0\\shad0"
     a = outro_start
@@ -113,7 +114,7 @@ def outro_layers(outro_start: float, total: float, brand: str = None,
                       f"\\t(0,500,\\fscx100)\\p1}}m -300 -1 l 300 -1 300 1 -300 1"))
         out.append(_d(6, a + 0.6, total, f"{{\\an5\\pos({W // 2},{y}){base}\\1c{GOLD}\\frz45"
                       f"\\fad(300,0)\\p1}}m -9 -9 l 9 -9 9 9 -9 9"))
-    if brand:
+    if brand and not logo_card:
         out.append(_d(6, a + 0.1, total,
                       f"{{\\an5\\pos({W // 2},720)\\fn{font}\\fs38\\fsp14\\b1\\1c&HFFFFFF&\\bord0"
                       f"\\shad2\\fad(400,0)}}{brand.upper()}"))

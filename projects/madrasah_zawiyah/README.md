@@ -20,9 +20,12 @@ python -m dakwah_editor ceramah.mp4 -o dakwah_madrasah_zawiyah.mp4 \
   --broll projects/madrasah_zawiyah/broll --keep-all \
   --font "Poppins Black" --sub-size 86 --max-chars 15 \
   --callout-font "Bebas Neue" --brand-font "Cinzel" \
-  --cta "JADI PENGINFAK TETAP|Madrasah Zawiyah  •  Tekan pautan di bawah" \
-  --music nasheed --music-db -11 --premium --brand "Madrasah Zawiyah"
+  --cta "JADI PENGINFAK TETAP|Madrasah Zawiyah An Nur  •  Tekan pautan di bawah" \
+  --music nasheed --music-db -11 --premium --brand "Madrasah Zawiyah An Nur" \
+  --logo projects/madrasah_zawiyah/brand/logo_asal.jpg
 ```
 
 Fon (OFL, disertakan dalam `dakwah_editor/fonts/`): Poppins Black (subtitle), Bebas Neue (callout), Cinzel (jenama & penutup).
 Tambah `--reuse-base` untuk render semula pantas jika hanya grafik/gambar/audio berubah.
+
+Logo: `brand/logo_asal.jpg` (Madrasah Zawiyah An Nur + An Nur Centre) → lencana sudut atas & kad penutup (`python -m dakwah_editor.brandkit`).

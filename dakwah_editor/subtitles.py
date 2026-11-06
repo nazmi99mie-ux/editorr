@@ -43,7 +43,8 @@ def build_ass(timeline: dict, path: str, font="DejaVu Sans", uppercase=True,
               title=None, cta=("SEMOGA BERMANFAAT", "Kongsikan kepada yang tersayang"),
               flashes=(), outro_start=None, total=None, sub_y=1340,
               callouts=(), callout_y=1010, premium=False, brand=None, leaks=(),
-              callout_font=None, brand_font=None, sub_size=84, max_chars=20) -> None:
+              callout_font=None, brand_font=None, sub_size=84, max_chars=20,
+              logo_badge=False, logo_card=False) -> None:
     callout_font = callout_font or font
     brand_font = brand_font or font
     condensed = "bebas" in callout_font.lower()
@@ -150,7 +151,8 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     # Kad penutup
     if outro_start is not None and total:
         dim = f"{{\\an7\\pos(0,0)\\bord0\\shad0\\1c&H000000&\\1a&H50&\\fad(500,0)\\p1}}{rect}"
-        lines.append(f"Dialogue: 1,{_ts(outro_start)},{_ts(total)},Fx,,0,0,0,,{dim}")
+        if not logo_card:  # dengan kad logo, gelapkan dalam ffmpeg (di bawah logo)
+            lines.append(f"Dialogue: 1,{_ts(outro_start)},{_ts(total)},Fx,,0,0,0,,{dim}")
         lines.append(
             f"Dialogue: 5,{_ts(outro_start + 0.2)},{_ts(total)},Cta,,0,0,0,,"
             f"{{\\an5\\pos(540,880)\\fad(400,0)\\fscx80\\fscy80\\t(0,400,\\fscx100\\fscy100)}}{_esc(cta[0])}")
@@ -162,9 +164,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         from . import premium as pm
         speech_end = outro_start if outro_start is not None else timeline["duration"]
         lines += pm.layers(speech_end, total or speech_end, brand=brand, leaks=leaks,
-                           sub_y=sub_y, font=brand_font)
+                           sub_y=sub_y, font=brand_font, brand_tag=not logo_badge)
         if outro_start is not None and total:
-            lines += pm.outro_layers(outro_start, total, brand=brand, font=brand_font)
+            lines += pm.outro_layers(outro_start, total, brand=brand, font=brand_font,
+                                     logo_card=logo_card)
 
     with open(path, "w", encoding="utf-8") as f:
         f.write(header + "\n".join(lines) + "\n")

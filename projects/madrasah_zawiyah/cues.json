@@ -52,7 +52,7 @@
   },
   {
    "cue": "penyelenggaraan",
-   "file": "real_pondok_kayu.jpg",
+   "file": "real_juruelektrik.jpg",
    "dur": 1.2
   },
   {
@@ -94,8 +94,8 @@
   {
    "cue": "makan",
    "nth": 2,
-   "file": "real_makan_bersama.jpg",
-   "dur": 1.5
+   "file": "real_warga_minum.jpg",
+   "dur": 1.6
   },
   {
    "cue": "guru",
