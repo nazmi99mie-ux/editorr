@@ -12,8 +12,8 @@
   },
   {
    "cue": "bantu",
-   "file": "bantu.jpg",
-   "dur": 2.2
+   "file": "real_pimpin_warga.jpg",
+   "dur": 2.4
   },
   {
    "cue": "madrasah",
@@ -42,12 +42,12 @@
   },
   {
    "cue": "elektrik",
-   "file": "elektrik.jpg",
-   "dur": 1.0
+   "file": "real_meter_elektrik.jpg",
+   "dur": 1.1
   },
   {
    "cue": "air",
-   "file": "air.jpg",
+   "file": "real_meter_air.jpg",
    "dur": 1.0
   },
   {
@@ -110,7 +110,7 @@
   },
   {
    "cue": "pahala",
-   "file": "pahala.jpg",
+   "file": "real_solat_jemaah.jpg",
    "dur": 2.8
   },
   {
@@ -121,12 +121,12 @@
   },
   {
    "cue": "membantu",
-   "file": "real_pelajar_quran.jpg",
+   "file": "real_pimpin_warga.jpg",
    "dur": 2.0
   },
   {
    "cue": "disampaikan",
-   "file": "real_himpunan.jpg",
+   "file": "real_pelajar_rostrum.jpg",
    "dur": 1.5
   },
   {
