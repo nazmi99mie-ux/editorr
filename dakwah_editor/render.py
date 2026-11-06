@@ -99,7 +99,7 @@ def render_base(src, timeline, work, fit="cover", crop_x=0.5, crop_y=0.5, jobs=4
 
 
 def render_final(base, timeline, brolls, ass_path, music_wav, sfx_wav, out,
-                 outro=3.0, music_db=-16):
+                 outro=3.0, music_db=-16, premium=False):
     speech = timeline["duration"]
     total = speech + outro
     inputs = ["-i", base]
@@ -117,11 +117,14 @@ def render_final(base, timeline, brolls, ass_path, music_wav, sfx_wav, out,
                 z = f"1.0+0.10*on/{nfr}"
             else:
                 z = f"1.10-0.10*on/{nfr}"
+            if premium:  # punch-zoom masuk (tanpa koma: max(0,u) = (u+abs(u))/2)
+                u = f"(1-on/{int(0.3 * FPS)})"
+                z += f"+0.16*(({u}+abs({u}))/2)*(({u}+abs({u}))/2)"
             ox = "(iw-iw/zoom)/2" if i % 3 else f"(iw-iw/zoom)*on/{nfr}"
             mv = (f"scale={int(W * SS)}:{int(H * SS)}:force_original_aspect_ratio=increase,"
                   f"crop={int(W * SS)}:{int(H * SS)},"
                   f"zoompan=z='{z}':x='{ox}':y='(ih-ih/zoom)/2':d=1:s={W}x{H}:fps={FPS},setsar=1")
-        fd = min(0.3, b["dur"] / 4)
+        fd = min(0.18 if premium else 0.3, b["dur"] / 4)
         fc.append(
             f"[{i}:v]{mv},{GRADE},format=yuva420p,"
             f"fade=t=in:st=0:d={fd}:alpha=1,fade=t=out:st={b['dur'] - fd:.3f}:d={fd}:alpha=1,"
@@ -131,7 +134,11 @@ def render_final(base, timeline, brolls, ass_path, music_wav, sfx_wav, out,
         last = f"o{i}"
     ass = ass_path.replace("\\", "/").replace(":", "\\:").replace("'", "\\'")
     fc.append(
-        f"[{last}]tpad=stop_mode=clone:stop_duration={outro},vignette=PI/4.5,"
+        f"[{last}]tpad=stop_mode=clone:stop_duration={outro},"
+        + ("format=gbrp,split=2[pa][pb];[pb]scale=270:480,gblur=sigma=6,scale=1080:1920,"
+           "curves=all='0/0 0.55/0.1 1/1'[pg];[pa][pg]blend=all_mode=screen:all_opacity=0.35,"
+           "format=yuv420p,eq=contrast=1.05:saturation=1.06," if premium else "")
+        + "vignette=PI/4.5,"
         f"noise=alls=3:allf=t,ass='{ass}',"
         f"fade=t=in:st=0:d=0.25,fade=t=out:st={total - 1.0:.3f}:d=1.0,format=yuv420p[vout]")
 

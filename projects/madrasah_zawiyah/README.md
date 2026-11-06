@@ -20,5 +20,5 @@ python -m dakwah_editor ceramah.mp4 -o dakwah_madrasah_zawiyah.mp4 \
   --broll projects/madrasah_zawiyah/broll --keep-all \
   --font "Inter Display Black" \
   --cta "JADI PENGINFAK TETAP|Madrasah Zawiyah  •  Tekan pautan di bawah" \
-  --music nasheed --music-db -11
+  --music nasheed --music-db -11 --premium --brand "Madrasah Zawiyah"
 ```

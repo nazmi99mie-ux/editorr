@@ -42,7 +42,7 @@ def group_words(words: list, max_words=3, max_chars=20, gap=0.45) -> list:
 def build_ass(timeline: dict, path: str, font="DejaVu Sans", uppercase=True,
               title=None, cta=("SEMOGA BERMANFAAT", "Kongsikan kepada yang tersayang"),
               flashes=(), outro_start=None, total=None, sub_y=1340,
-              callouts=(), callout_y=1010) -> None:
+              callouts=(), callout_y=1010, premium=False, brand=None, leaks=()) -> None:
     lines = []
     header = f"""[Script Info]
 ScriptType: v4.00+
@@ -110,6 +110,13 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             f"{{\\an5\\pos({W // 2},{y})\\fad(80,250)\\blur6\\fscx170\\fscy170\\fsp30"
             f"\\t(0,220,\\blur0.6\\fscx100\\fscy100\\fsp4)"
             f"\\t(220,{int(c['dur'] * 1000)},\\fscx106\\fscy106)}}{_esc(c['text'])}")
+        if premium:  # kilauan cahaya merentasi teks
+            ms = int(c["dur"] * 1000)
+            lines.append(
+                f"Dialogue: 7,{_ts(a + 0.25)},{_ts(b)},Call,,0,0,0,,"
+                f"{{\\an5\\pos({W // 2},{y})\\fad(0,250)\\1c&HFFFFFF&\\3a&HFF&\\4a&HFF&\\blur1"
+                f"\\t(0,{ms},\\fscx106\\fscy106)"
+                f"\\clip(-260,0,-120,{H})\\t(0,650,\\clip(1200,0,1340,{H}))}}{_esc(c['text'])}")
         bar = "m 0 0 l 520 0 520 8 0 8"
         lines.append(
             f"Dialogue: 6,{_ts(a + 0.12)},{_ts(b)},Fx,,0,0,0,,"
@@ -146,6 +153,14 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         lines.append(
             f"Dialogue: 5,{_ts(outro_start + 0.6)},{_ts(total)},Cta2,,0,0,0,,"
             f"{{\\an5\\pos(540,990)\\fad(400,0)}}{_esc(cta[1])}")
+
+    if premium:
+        from . import premium as pm
+        speech_end = outro_start if outro_start is not None else timeline["duration"]
+        lines += pm.layers(speech_end, total or speech_end, brand=brand, leaks=leaks,
+                           sub_y=sub_y, font=font)
+        if outro_start is not None and total:
+            lines += pm.outro_layers(outro_start, total, brand=brand, font=font)
 
     with open(path, "w", encoding="utf-8") as f:
         f.write(header + "\n".join(lines) + "\n")
