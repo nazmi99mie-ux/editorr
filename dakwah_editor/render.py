@@ -133,13 +133,14 @@ def render_final(base, timeline, brolls, ass_path, music_wav, sfx_wav, out,
                   f"enable='between(t,{b['start']},{b['start'] + b['dur']:.3f})'[o{i}]")
         last = f"o{i}"
     ass = ass_path.replace("\\", "/").replace(":", "\\:").replace("'", "\\'")
+    fdir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts").replace(":", "\\:")
     fc.append(
         f"[{last}]tpad=stop_mode=clone:stop_duration={outro},"
         + ("format=gbrp,split=2[pa][pb];[pb]scale=270:480,gblur=sigma=6,scale=1080:1920,"
            "curves=all='0/0 0.55/0.1 1/1'[pg];[pa][pg]blend=all_mode=screen:all_opacity=0.35,"
            "format=yuv420p,eq=contrast=1.05:saturation=1.06," if premium else "")
         + "vignette=PI/4.5,"
-        f"noise=alls=3:allf=t,ass='{ass}',"
+        f"noise=alls=3:allf=t,ass='{ass}':fontsdir='{fdir}',"
         f"fade=t=in:st=0:d=0.25,fade=t=out:st={total - 1.0:.3f}:d=1.0,format=yuv420p[vout]")
 
     k = len(brolls)

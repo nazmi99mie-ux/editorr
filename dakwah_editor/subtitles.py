@@ -42,7 +42,11 @@ def group_words(words: list, max_words=3, max_chars=20, gap=0.45) -> list:
 def build_ass(timeline: dict, path: str, font="DejaVu Sans", uppercase=True,
               title=None, cta=("SEMOGA BERMANFAAT", "Kongsikan kepada yang tersayang"),
               flashes=(), outro_start=None, total=None, sub_y=1340,
-              callouts=(), callout_y=1010, premium=False, brand=None, leaks=()) -> None:
+              callouts=(), callout_y=1010, premium=False, brand=None, leaks=(),
+              callout_font=None, brand_font=None, sub_size=84, max_chars=20) -> None:
+    callout_font = callout_font or font
+    brand_font = brand_font or font
+    condensed = "bebas" in callout_font.lower()
     lines = []
     header = f"""[Script Info]
 ScriptType: v4.00+
@@ -54,11 +58,11 @@ YCbCr Matrix: TV.709
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Sub,{font},84,{WHITE},{WHITE},{BLACK},&H96000000,-1,0,0,0,100,100,1,0,1,7,4,5,60,60,0,1
+Style: Sub,{font},{sub_size},{WHITE},{WHITE},{BLACK},&H96000000,-1,0,0,0,100,100,1,0,1,7,4,5,60,60,0,1
 Style: Title,{font},66,{WHITE},{WHITE},{BLACK},&H80000000,-1,0,0,0,100,100,3,0,1,5,3,8,70,70,260,1
-Style: Cta,{font},78,{GOLD},{WHITE},{BLACK},&H80000000,-1,0,0,0,100,100,2,0,1,6,3,5,70,70,0,1
+Style: Cta,{brand_font},78,{GOLD},{WHITE},{BLACK},&H80000000,-1,0,0,0,100,100,2,0,1,6,3,5,70,70,0,1
 Style: Cta2,{font},50,{WHITE},{WHITE},{BLACK},&H80000000,0,0,0,0,100,100,1,0,1,4,2,5,70,70,0,1
-Style: Call,{font},150,{GOLD},{WHITE},&H00152A55,&H90000000,-1,0,0,0,100,100,4,0,1,8,6,5,40,40,0,1
+Style: Call,{callout_font},{210 if condensed else 150},{GOLD},{WHITE},&H00152A55,&H90000000,{0 if condensed else -1},0,0,0,100,100,{8 if condensed else 4},0,1,8,6,5,40,40,0,1
 Style: Call2,{font},58,{WHITE},{WHITE},{BLACK},&H90000000,-1,0,0,0,100,100,6,0,1,5,3,5,40,40,0,1
 Style: Fx,{font},10,{WHITE},{WHITE},{BLACK},{BLACK},0,0,0,0,100,100,0,0,1,0,0,7,0,0,0,1
 
@@ -66,7 +70,7 @@ Style: Fx,{font},10,{WHITE},{WHITE},{BLACK},{BLACK},0,0,0,0,100,100,0,0,1,0,0,7,
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     words = timeline["words"]
-    groups = group_words(words)
+    groups = group_words(words, max_chars=max_chars)
     for gi, g in enumerate(groups):
         g_end = g[-1]["e"] + 0.25
         if gi + 1 < len(groups):
@@ -158,9 +162,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         from . import premium as pm
         speech_end = outro_start if outro_start is not None else timeline["duration"]
         lines += pm.layers(speech_end, total or speech_end, brand=brand, leaks=leaks,
-                           sub_y=sub_y, font=font)
+                           sub_y=sub_y, font=brand_font)
         if outro_start is not None and total:
-            lines += pm.outro_layers(outro_start, total, brand=brand, font=font)
+            lines += pm.outro_layers(outro_start, total, brand=brand, font=brand_font)
 
     with open(path, "w", encoding="utf-8") as f:
         f.write(header + "\n".join(lines) + "\n")

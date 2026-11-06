@@ -38,6 +38,10 @@ def main(argv=None):
     ap.add_argument("--title", help="tajuk besar di atas semasa hook (pilihan)")
     ap.add_argument("--cta", default="SEMOGA BERMANFAAT|Kongsikan kepada yang tersayang")
     ap.add_argument("--font", default="DejaVu Sans", help="nama fon (cth. Montserrat ExtraBold)")
+    ap.add_argument("--callout-font", help="fon callout besar (cth. 'Bebas Neue')")
+    ap.add_argument("--brand-font", help="fon tag jenama & kad penutup (cth. 'Cinzel')")
+    ap.add_argument("--sub-size", type=int, default=84)
+    ap.add_argument("--max-chars", type=int, default=20, help="aksara maksimum sebaris subtitle")
     ap.add_argument("--fit", choices=["cover", "blur"], default="cover",
                     help="cover = crop penuh 9:16; blur = video penuh atas latar kabur")
     ap.add_argument("--crop-x", type=float, default=0.5, help="kedudukan crop mendatar 0..1")
@@ -141,6 +145,8 @@ def main(argv=None):
     subtitles.build_ass(tl, ass, font=a.font, uppercase=not a.no_upper, title=a.title,
                         cta=cta, flashes=flashes, outro_start=tl["duration"], total=total,
                         callouts=callouts, premium=a.premium, brand=a.brand,
+                        callout_font=a.callout_font, brand_font=a.brand_font,
+                        sub_size=a.sub_size, max_chars=a.max_chars,
                         leaks=[b["start"] for b in placed if b["dur"] >= 1.5])
 
     sfx_wav = None

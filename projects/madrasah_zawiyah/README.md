@@ -18,7 +18,11 @@ python -m dakwah_editor ceramah.mp4 -o dakwah_madrasah_zawiyah.mp4 \
   --fixes projects/madrasah_zawiyah/fixes.json \
   --cues projects/madrasah_zawiyah/cues.json \
   --broll projects/madrasah_zawiyah/broll --keep-all \
-  --font "Inter Display Black" \
+  --font "Poppins Black" --sub-size 86 --max-chars 15 \
+  --callout-font "Bebas Neue" --brand-font "Cinzel" \
   --cta "JADI PENGINFAK TETAP|Madrasah Zawiyah  •  Tekan pautan di bawah" \
   --music nasheed --music-db -11 --premium --brand "Madrasah Zawiyah"
 ```
+
+Fon (OFL, disertakan dalam `dakwah_editor/fonts/`): Poppins Black (subtitle), Bebas Neue (callout), Cinzel (jenama & penutup).
+Tambah `--reuse-base` untuk render semula pantas jika hanya grafik/gambar/audio berubah.
